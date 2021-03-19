@@ -84,7 +84,7 @@ def init():
     print('此程序版本：' + str(version))
     urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/ArticlesHelper/release.json'
     try:
-        update = requests.get(urlgithub)
+        update = requests.get(urlgithub, timeout=2)
         ver = update.json()
         if ver['releases'][0]['version'] > version:
             print('[bold yellow]更新[/bold yellow]啦！从GitHub获取更新详情成功！\n最新版本是：' +
@@ -96,7 +96,7 @@ def init():
     except (Exception):
         urlgitee = 'https://gitee.com/evilbutcher/Python/raw/master/ArticlesHelper/release.json'
         try:
-            update = requests.get(urlgitee)
+            update = requests.get(urlgitee, timeout=2)
             ver = update.json()
             if ver['releases'][0]['version'] > version:
                 print('[bold red]更新[/bold red]啦！从Gitee获取更新详情成功！\n最新版本是：' +

@@ -11,11 +11,11 @@ from rich import print
 
 def init():
     print('检测更新中...')
-    version = 1.5
+    version = 1.6
     print('此程序版本：' + str(version))
     try:
         urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/evanescent/release.json'
-        update = requests.get(urlgithub)
+        update = requests.get(urlgithub, timeout=2)
         ver = update.json()
         if ver['releases'][0]['version'] > version:
             print('[bold yellow]更新[/bold yellow]啦！从GitHub获取更新详情成功！\n最新版本是：' +
@@ -27,7 +27,7 @@ def init():
     except (Exception):
         urlgitee = 'https://gitee.com/evilbutcher/Python/raw/master/evanescent/release.json'
         try:
-            update = requests.get(urlgitee)
+            update = requests.get(urlgitee, timeout=2)
             ver = update.json()
             if ver['releases'][0]['version'] > version:
                 print('[bold red]更新[/bold red]啦！从Gitee获取更新详情成功！\n最新版本是：' +
@@ -52,6 +52,10 @@ def init():
 
 def dealxlsx(path: str, name: str, canprint: bool):
     try:
+        mode = input('1 = 基线全为基准值\n2 = 基线仅在基准值处相同\n请输入“1或2”：')
+        if mode != 1 or mode != 2:
+            print('模式输入错误，请重新运行程序重新输入！')
+            return
         workbook = xlrd.open_workbook(path + '/' + name)
         sheet_name = workbook.sheet_names()[0]
         print('\n读取的Excel表名为：' + sheet_name)
@@ -88,7 +92,52 @@ def dealxlsx(path: str, name: str, canprint: bool):
                     if canprint is True:
                         print('1列' + str(num + 1) + '行 写入时间：' + str(int(num)) +
                               '秒' + '\n')
-                if num > startpoint:
+                if int(mode) == 1:
+                    if num > startpoint:
+                        if canprint is True:
+                            print(
+                                str(col + 1) + '列' + str(num + 1) + '行' +
+                                '读取数据：' + str(sheet.cell(num, col).value))
+                        if isinstance(sheet.cell(num, col).value,
+                                      float) is True:
+                            result.cell(
+                                num + 1, col +
+                                1).value = sheet.cell(num, col).value - minus
+                        else:
+                            print(
+                                str(col) + '列' + str(num + 1) +
+                                '行 读取数据[bold red]错误[/bold red]，请检查相应位置，此处选用上一个数值'
+                            )
+                            if isinstance(
+                                    sheet.cell(num - 1, col).value,
+                                    float) is True:
+                                result.cell(num + 1,
+                                            col + 1).value = sheet.cell(
+                                                num - 1, col).value - minus
+                            else:
+                                print(
+                                    str(col) + '列' + str(num + 1) +
+                                    '行 读取数据出现[bold red]连续错误[/bold red]，请检查数据完整性'
+                                )
+                                return
+                        if canprint is True:
+                            print(
+                                str(col + 1) + '列' + str(num + 1) + '行' +
+                                '写入数据：' +
+                                str(float(sheet.cell(num, col).value -
+                                          minus)) + '\n')
+                    else:
+                        if canprint is True:
+                            print(
+                                str(col + 1) + '列' + str(num + 1) + '行' +
+                                '读取数据：' + str(sheet.cell(num, col).value))
+                        result.cell(num + 1,
+                                    col + 1).value = float(valueforall)
+                        if canprint is True:
+                            print(
+                                str(col + 1) + '列' + str(num + 1) + '行' +
+                                '写入数据：' + str(float(valueforall)) + '\n')
+                elif int(mode) == 2:
                     if canprint is True:
                         print(
                             str(col + 1) + '列' + str(num + 1) + '行' + '读取数据：' +
@@ -115,16 +164,6 @@ def dealxlsx(path: str, name: str, canprint: bool):
                             str(col + 1) + '列' + str(num + 1) + '行' + '写入数据：' +
                             str(float(sheet.cell(num, col).value - minus)) +
                             '\n')
-                else:
-                    if canprint is True:
-                        print(
-                            str(col + 1) + '列' + str(num + 1) + '行' + '读取数据：' +
-                            str(sheet.cell(num, col).value))
-                    result.cell(num + 1, col + 1).value = float(valueforall)
-                    if canprint is True:
-                        print(
-                            str(col + 1) + '列' + str(num + 1) + '行' + '写入数据：' +
-                            str(float(valueforall)) + '\n')
         wb.save("result.xlsx")
         print('[bold green]数据处理完成[/bold green]')
     except Exception as e:
