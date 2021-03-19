@@ -1,5 +1,6 @@
 {
   "releases": [
+    { "version": 2.6, "details": "增加下载前检查Sci-Hub可用地址功能" },
     { "version": 2.5, "details": "增加下载前检查articels目录，方便下载上一次运行下载失败的文献" },
     { "version": 2.4, "details": "增加下载接口至5个" },
     { "version": 2.3, "details": "增加Web of Science文献记录解析；增加下载情况判断" },
