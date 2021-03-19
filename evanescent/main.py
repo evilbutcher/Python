@@ -10,7 +10,7 @@ from rich import print
 
 
 def init():
-    print('初始化中，请稍等...')
+    print('检测更新中...')
     version = 1.5
     print('此程序版本：' + str(version))
     try:
