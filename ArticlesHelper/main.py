@@ -80,7 +80,7 @@ def parsehtml(name):
 
 def init():
     print('检测更新中...')
-    version = 2.5
+    version = 2.6
     print('此程序版本：' + str(version))
     urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/ArticlesHelper/release.json'
     try:
@@ -144,113 +144,60 @@ def init():
         print('获取目录出错啦，错误原因：' + str(e))
 
 
-def stwgetdllink(name, doi):
+def getscihubaddress():
+    print('检测Sci-Hub最新地址中...')
+    link = 'https://lovescihub.wordpress.com/'
+    data = requests.get(link)
+    html = data.text
+    afterhtml = BeautifulSoup(html, 'html.parser')
+    content = afterhtml.find('div', {"class": "entry-content"})
+    urls = content.findAll('a')
+    finalurl = []
+    for url in urls:
+        if url.get('href') is not None:
+            preurl = url.get('href')
+            if re.search(r'sci-hub', str(preurl)) is not None:
+                finalurl.append(preurl)
+    return finalurl
+
+
+def scihubdllink(name, doi):
     try:
-        hostlink = 'https://sci-hub.tw/'
-        link = hostlink + doi
-        data = requests.get(link)
-        # 获取下载链接
-        html = data.text
-        afterhtml = BeautifulSoup(html, 'html.parser')
-        div = afterhtml.find('iframe', id='pdf')
-        pdflink = div.get('src')
-        if re.match(r'https:', pdflink) is None:
-            postlink = 'https:' + pdflink
-        else:
-            postlink = pdflink
-        print('tw获取下载链接[bold green]成功[/bold green]：' + postlink)
-        urls[doi] = postlink
-        return True
+        hosturls = getscihubaddress()
     except Exception as e:
         table = Table(show_header=True, header_style="bold magenta")
-        table.add_column("文件名")
         table.add_column("状态")
         table.add_column("原因")
-        table.add_row(name, '[bold red]未找到文献[/bold red]', str(e))
+        table.add_row('[bold red]获取Sci-Hub最新地址失败[/bold red]', str(e))
         console.print(table)
-        urls[doi] = None
-        return False
-
-
-def ssegetdllink(name, doi):
     try:
-        hostlink = 'https://sci-hub.se/'
-        link = hostlink + doi
-        data = requests.get(link)
-        # 获取下载链接
-        html = data.text
-        afterhtml = BeautifulSoup(html, 'html.parser')
-        div = afterhtml.find('iframe', id='pdf')
-        pdflink = div.get('src')
-        if re.match(r'https:', pdflink) is None:
-            postlink = 'https:' + pdflink
-        else:
-            postlink = pdflink
-        print('se获取下载链接[bold green]成功[/bold green]：' + postlink)
-        urls[doi] = postlink
-        return True
+        for url in hosturls:
+            link = url + '/' + doi
+            data = requests.get(link)
+            if data.status_code == 200:
+                # 获取下载链接
+                html = data.text
+                afterhtml = BeautifulSoup(html, 'html.parser')
+                div = afterhtml.find('iframe', id='pdf')
+                if div is None:
+                    raise Exception('文献[bold red]未找到[/bold red]')
+                pdflink = div.get('src')
+                if re.match(r'https:', pdflink) is None:
+                    postlink = 'https:' + pdflink
+                else:
+                    postlink = pdflink
+                print('Sci-Hub获取下载链接[bold green]成功[/bold green]：' + postlink)
+                urls[doi] = postlink
+                return True
+            elif data.status_code == 403:
+                raise Exception('访问被拒绝')
+            elif data.status_code == 404:
+                raise Exception('网页未找到')
     except Exception as e:
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("文件名")
-        table.add_column("状态")
         table.add_column("原因")
-        table.add_row(name, '[bold red]未找到文献[/bold red]', str(e))
-        console.print(table)
-        urls[doi] = None
-        return False
-
-
-def sstgetdllink(name, doi):
-    try:
-        hostlink = 'https://sci-hub.st/'
-        link = hostlink + doi
-        data = requests.get(link)
-        # 获取下载链接
-        html = data.text
-        afterhtml = BeautifulSoup(html, 'html.parser')
-        div = afterhtml.find('iframe', id='pdf')
-        pdflink = div.get('src')
-        if re.match(r'https:', pdflink) is None:
-            postlink = 'https:' + pdflink
-        else:
-            postlink = pdflink
-        print('st获取下载链接[bold green]成功[/bold green]：' + postlink)
-        urls[doi] = postlink
-        return True
-    except Exception as e:
-        table = Table(show_header=True, header_style="bold magenta")
-        table.add_column("文件名")
-        table.add_column("状态")
-        table.add_column("原因")
-        table.add_row(name, '[bold red]未找到文献[/bold red]', str(e))
-        console.print(table)
-        urls[doi] = None
-        return False
-
-
-def srngetdllink(name, doi):
-    try:
-        hostlink = 'https://sci-hub.ren/'
-        link = hostlink + doi
-        data = requests.get(link)
-        # 获取下载链接
-        html = data.text
-        afterhtml = BeautifulSoup(html, 'html.parser')
-        div = afterhtml.find('iframe', id='pdf')
-        pdflink = div.get('src')
-        if re.match(r'https:', pdflink) is None:
-            postlink = 'https:' + pdflink
-        else:
-            postlink = pdflink
-        print('ren获取下载链接[bold green]成功[/bold green]：' + postlink)
-        urls[doi] = postlink
-        return True
-    except Exception as e:
-        table = Table(show_header=True, header_style="bold magenta")
-        table.add_column("文件名")
-        table.add_column("状态")
-        table.add_column("原因")
-        table.add_row(name, '[bold red]未找到文献[/bold red]', str(e))
+        table.add_row(name, str(e))
         console.print(table)
         urls[doi] = None
         return False
@@ -261,81 +208,42 @@ def lbggetdllink(name, doi):
         hostlink = 'https://libgen.lc/scimag/ads.php?doi='
         link = hostlink + doi
         data = requests.get(link)
-        # 获取下载链接
-        html = data.text
-        afterhtml = BeautifulSoup(html, 'html.parser')
-        div = afterhtml.find('a')
-        pdflink = div.get('href')
-        print('lib获取下载链接[bold green]成功[/bold green]：' + pdflink)
-        urls[doi] = pdflink
-        return True
+        if data.status_code == 200:
+            # 获取下载链接
+            html = data.text
+            afterhtml = BeautifulSoup(html, 'html.parser')
+            div = afterhtml.find('a')
+            if div is None:
+                raise Exception('文献[bold red]未找到[/bold red]')
+            pdflink = div.get('href')
+            print('libgen获取下载链接[bold green]成功[/bold green]：' + pdflink)
+            urls[doi] = pdflink
+            return True
+        elif data.status_code == 403:
+            raise Exception('访问被拒绝')
+        elif data.status_code == 404:
+            raise Exception('网页未找到')
     except Exception as e:
         table = Table(show_header=True, header_style="bold magenta")
         table.add_column("文件名")
-        table.add_column("状态")
         table.add_column("原因")
-        table.add_row(name, '[bold red]未找到文献[/bold red]', str(e))
+        table.add_row(name, str(e))
         console.print(table)
         urls[doi] = None
         return False
 
 
 def continuousgetlink(name, doi, i):
-    if (i + 1) % 5 == 1:
-        if stwgetdllink(name, doi) is False:
+    if (i + 1) % 2 == 0:
+        if scihubdllink(name, doi) is False:
             print('自动更换地址[bold green]重新获取[/bold green]')
             if lbggetdllink(name, doi) is False:
-                print('自动更换地址[bold green]重新获取[/bold green]')
-                if sstgetdllink(name, doi) is False:
-                    print('自动更换地址[bold green]重新获取[/bold green]')
-                    if srngetdllink(name, doi) is False:
-                        print('自动更换地址[bold green]重新获取[/bold green]')
-                        if ssegetdllink(name, doi) is False:
-                            print('很抱歉，此文献[bold red]未找到[/bold red]')
-    elif (i + 1) % 5 == 2:
+                print('很抱歉，此文献[bold red]未找到[/bold red]')
+    elif (i + 1) % 2 == 1:
         if lbggetdllink(name, doi) is False:
             print('自动更换地址[bold green]重新获取[/bold green]')
-            if sstgetdllink(name, doi) is False:
-                print('自动更换地址[bold green]重新获取[/bold green]')
-                if srngetdllink(name, doi) is False:
-                    print('自动更换地址[bold green]重新获取[/bold green]')
-                    if ssegetdllink(name, doi) is False:
-                        print('自动更换地址[bold green]重新获取[/bold green]')
-                        if stwgetdllink(name, doi) is False:
-                            print('很抱歉，此文献[bold red]未找到[/bold red]')
-    elif (i + 1) % 5 == 3:
-        if sstgetdllink(name, doi) is False:
-            print('自动更换地址[bold green]重新获取[/bold green]')
-            if srngetdllink(name, doi) is False:
-                print('自动更换地址[bold green]重新获取[/bold green]')
-                if ssegetdllink(name, doi) is False:
-                    print('自动更换地址[bold green]重新获取[/bold green]')
-                    if lbggetdllink(name, doi) is False:
-                        print('自动更换地址[bold green]重新获取[/bold green]')
-                        if stwgetdllink(name, doi) is False:
-                            print('很抱歉，此文献[bold red]未找到[/bold red]')
-    elif (i + 1) % 5 == 4:
-        if srngetdllink(name, doi) is False:
-            print('自动更换地址[bold green]重新获取[/bold green]')
-            if ssegetdllink(name, doi) is False:
-                print('自动更换地址[bold green]重新获取[/bold green]')
-                if lbggetdllink(name, doi) is False:
-                    print('自动更换地址[bold green]重新获取[/bold green]')
-                    if stwgetdllink(name, doi) is False:
-                        print('自动更换地址[bold green]重新获取[/bold green]')
-                        if sstgetdllink(name, doi) is False:
-                            print('很抱歉，此文献[bold red]未找到[/bold red]')
-    else:
-        if ssegetdllink(name, doi) is False:
-            print('自动更换地址[bold green]重新获取[/bold green]')
-            if lbggetdllink(name, doi) is False:
-                print('自动更换地址[bold green]重新获取[/bold green]')
-                if stwgetdllink(name, doi) is False:
-                    print('自动更换地址[bold green]重新获取[/bold green]')
-                    if sstgetdllink(name, doi) is False:
-                        print('自动更换地址[bold green]重新获取[/bold green]')
-                        if srngetdllink(name, doi) is False:
-                            print('很抱歉，此文献[bold red]未找到[/bold red]')
+            if scihubdllink(name, doi) is False:
+                print('很抱歉，此文献[bold red]未找到[/bold red]')
 
 
 def checkdownload(dois):
