@@ -11,7 +11,7 @@ from rich import print
 
 def init():
     print('初始化中，请稍等...')
-    version = 1.4
+    version = 1.5
     print('此程序版本：' + str(version))
     try:
         urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/evanescent/release.json'
@@ -131,15 +131,11 @@ def dealxlsx(path: str, name: str, canprint: bool):
         print('处理excel[bold red]失败[/bold red]，原因：' + str(e))
 
 
-def setcolor():
-    wb = load_workbook(r'result.xlsx')
-    sheetnames = wb.sheetnames
-    ws = wb[sheetnames[0]]
+def setcolor(ws, num, name):
     rows = ws.max_row
     columns = ws.max_column
     color = 'FF6666'
     fille = PatternFill('solid', fgColor=color)
-    num = int(input('请输入本次实验的平行实验次数：'))
     waittocolor = []
     startnum = 1
     for m in range(0, num):
@@ -149,8 +145,39 @@ def setcolor():
         for k in range(i, columns + 1, num * 2):
             for j in range(1, rows + 1):
                 ws.cell(j, k).fill = fille
+    print(name + '[bold green]着色区分完成[/bold green]')
+    return num
+
+
+def setnumber():
+    wb = load_workbook(r'result.xlsx')
+    sheetnames = wb.sheetnames
+    ws = wb[sheetnames[0]]
+    num = int(input('请输入本次实验的平行实验次数：'))
+    group = setcolor(ws, num, ws.title)  # 染色未排序表格
+    rows = ws.max_row
+    columns = ws.max_column
+    ws2 = wb.create_sheet('排序后数据', 0)
+    for k in range(1, rows + 1):  # 生成时间列
+        ws2.cell(k, 1).value = k - 1
+    num = int(input('请输入要对比的第几秒的数据：'))
+    for i in range(2, columns, group):  # 平行组内排序
+        arry = []
+        for j in range(i, i + group):  # 提取平行组内数据
+            arry.append(ws.cell(num + 1, j).value)
+        arry.sort(reverse=True)
+        print(arry)
+        for n in range(i, i + group):  # 写入新表的相对位置
+            ws2.cell(num + 1, n).value = arry[n - i]
+        for o in range(i, i + group):  # 开始比较
+            d = ws.cell(num + 1, o).value  # 表1中未排序的顺序值
+            for p in range(i, i + group):  # 在表2中循环比较匹配
+                d2 = ws2.cell(num + 1, p).value
+                if d2 == d:
+                    for k in range(1, rows + 1):  # 全部行数
+                        ws2.cell(k, p).value = ws.cell(k, o).value
+    group = setcolor(ws2, group, ws2.title)  # 染色结果表格
     wb.save(r'result.xlsx')
-    print('着色区分完成')
 
 
 def main():
@@ -173,7 +200,7 @@ def main():
             dealxlsx('origindata/', name, canprint)
         exist = Path('result.xlsx')
         if exist.is_file() is True:
-            setcolor()
+            setnumber()
         input('如有问题请前往 https://github.com/evilbutcher/Python 提出issue，请按任意键退出')
     except Exception as e:
         print('主函数运行[bold red]出现错误[/bold red]，原因：' + str(e))
