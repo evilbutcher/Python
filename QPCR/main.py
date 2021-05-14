@@ -59,7 +59,7 @@ def dealxlsx(path: str, name: str, canprint: bool):
         intercept = float(
             input('请输入Origin拟合方程的截距'))  # Ct = intercept + slope * x
         ws.cell(1, 13).value = 'Log Copy'
-        for row in range(2, rows):
+        for row in range(2, rows):  # 计算Log Copy数
             try:
                 samplename = str(ws.cell(row, 4).value)
                 type = str(ws.cell(row, 5).value)
@@ -69,7 +69,7 @@ def dealxlsx(path: str, name: str, canprint: bool):
                 print('计算Log Copy出错，第' + str(row) + '行数据，名称：' + samplename +
                       '，类型：' + type + '，原因：' + str(e))
         ws.cell(1, 14).value = 'Copy'
-        for row in range(2, rows):
+        for row in range(2, rows):  # 计算Copy数
             try:
                 samplename = str(ws.cell(row, 4).value)
                 type = str(ws.cell(row, 5).value)
@@ -105,7 +105,7 @@ def dealxlsx(path: str, name: str, canprint: bool):
         WashVolumecoefficient = float(input('请输入清洗液的体积：')) / 2
         ElutionVolumecoefficient = float(input('请输入洗脱液的体积：')) / 2
         ws.cell(1, 15).value = 'DNA(pmole)'
-        for row in range(2, rows):
+        for row in range(2, rows):  # 计算mol数
             try:
                 samplename = str(ws.cell(row, 4).value)
                 type = str(ws.cell(row, 5).value)
@@ -132,7 +132,7 @@ def dealxlsx(path: str, name: str, canprint: bool):
                 print('转换pmol出错，第' + str(row) + '行数据，名称：' + samplename +
                       '，类型：' + type + '，原因：' + str(e))
         ws.cell(1, 16).value = 'Averange DNA(pmole)'
-        for row in range(23, rows, 3):
+        for row in range(23, rows, 3):  # 计算平均mol数
             try:
                 pmol1 = float(ws.cell(row, 15).value)
                 pmol2 = float(ws.cell(row + 1, 15).value)
@@ -140,6 +140,15 @@ def dealxlsx(path: str, name: str, canprint: bool):
                 ws.cell(row + 1, 16).value = (pmol1 + pmol2 + pmol3) / 3
             except Exception as e:
                 print('计算pmol平均值出错，第' + str(row) + '行数据，原因：' + str(e))
+        for row in range(23, rows, 6):  # 着色区分
+            columns = ws.max_column + 1
+            color = 'FF6666'
+            fille = PatternFill('solid', fgColor=color)
+            for column in range(1, columns):
+                ws.cell(row, column).fill = fille
+                ws.cell(row + 1, column).fill = fille
+                ws.cell(row + 2, column).fill = fille
+        print('[bold green]着色区分完成[/bold green]')
         wb.save(path + name)
         print('[bold green]数据处理完成[/bold green]')
     except Exception as e:
