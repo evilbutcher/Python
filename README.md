@@ -94,6 +94,10 @@ from rich.progress import (
 
 处理实验数据自用
 
+# [Q-PCR数据处理](https://github.com/evilbutcher/Python/blob/master/Q-PCR)
+
+处理实验数据自用
+
 ### 特别感谢：
 
 [@Rich](https://github.com/willmcgugan/rich)

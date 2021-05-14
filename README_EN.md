@@ -88,6 +88,10 @@ If there is an update, the software will automatically pop up an update prompt, 
 
 Processing experimental data for personal use
 
+# [Q-PCR](https://github.com/evilbutcher/Python/blob/master/Q-PCR)
+
+Processing experimental data for personal use
+
 ### Special thanks to
 
 [@Rich](https://github.com/willmcgugan/rich)
