@@ -11,7 +11,7 @@ from rich import print
 
 def init():
     print('检测更新中...')
-    version = 1.7
+    version = 1.8
     print('此程序版本：' + str(version))
     try:
         urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/evanescent/release.json'
@@ -52,8 +52,8 @@ def init():
 
 def dealxlsx(path: str, name: str, canprint: bool):
     try:
-        mode = input('1 = 基线全为基准值\n2 = 基线仅在基准值处相同\n请输入“1或2”：')
-        if mode != 1 or mode != 2:
+        mode = int(input('1 = 基线全为基准值\n2 = 基线仅在基准值处相同\n请输入“1或2”：'))
+        if mode != 1 and mode != 2:
             print('模式输入错误，请重新运行程序重新输入！')
             return
         workbook = xlrd.open_workbook(path + '/' + name)
