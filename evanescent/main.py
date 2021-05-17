@@ -11,7 +11,7 @@ from rich import print
 
 def init():
     print('检测更新中...')
-    version = 1.6
+    version = 1.7
     print('此程序版本：' + str(version))
     try:
         urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/evanescent/release.json'
@@ -173,7 +173,7 @@ def dealxlsx(path: str, name: str, canprint: bool):
 def setcolor(ws, num, name):
     rows = ws.max_row
     columns = ws.max_column
-    color = 'FF6666'
+    color = 'FFB6C1'
     fille = PatternFill('solid', fgColor=color)
     waittocolor = []
     startnum = 1

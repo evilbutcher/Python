@@ -1,5 +1,6 @@
 {
   "releases": [
+    { "version": 1.7, "details": "优化配色" },
     { "version": 1.6, "details": "增加两种模式选择功能" },
     { "version": 1.5, "details": "增加自动排序功能" },
     { "version": 1.4, "details": "修复数据缺失提示" },
