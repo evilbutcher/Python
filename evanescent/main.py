@@ -194,28 +194,34 @@ def setnumber():
     ws = wb[sheetnames[0]]
     num = int(input('请输入本次实验的平行实验次数：'))
     group = setcolor(ws, num, ws.title)  # 染色未排序表格
-    rows = ws.max_row
-    columns = ws.max_column
-    ws2 = wb.create_sheet('排序后数据', 0)
-    for k in range(1, rows + 1):  # 生成时间列
-        ws2.cell(k, 1).value = k - 1
-    num = int(input('请输入要对比的第几秒的数据：'))
-    for i in range(2, columns, group):  # 平行组内排序
-        arry = []
-        for j in range(i, i + group):  # 提取平行组内数据
-            arry.append(ws.cell(num + 1, j).value)
-        arry.sort(reverse=True)
-        print(arry)
-        for n in range(i, i + group):  # 写入新表的相对位置
-            ws2.cell(num + 1, n).value = arry[n - i]
-        for o in range(i, i + group):  # 开始比较
-            d = ws.cell(num + 1, o).value  # 表1中未排序的顺序值
-            for p in range(i, i + group):  # 在表2中循环比较匹配
-                d2 = ws2.cell(num + 1, p).value
-                if d2 == d:
-                    for k in range(1, rows + 1):  # 全部行数
-                        ws2.cell(k, p).value = ws.cell(k, o).value
-    group = setcolor(ws2, group, ws2.title)  # 染色结果表格
+    wb.save(r'result.xlsx')
+    print('如果无需排序请直接[bold red]关闭程序[/bold red]')
+    goon = input('是否要继续排序？y=继续；n=不继续')
+    if goon == 'y':
+        rows = ws.max_row
+        columns = ws.max_column
+        ws2 = wb.create_sheet('排序后数据', 0)
+        for k in range(1, rows + 1):  # 生成时间列
+            ws2.cell(k, 1).value = k - 1
+        num = int(input('请输入要对比的第几秒的数据：'))
+        for i in range(2, columns, group):  # 平行组内排序
+            arry = []
+            for j in range(i, i + group):  # 提取平行组内数据
+                arry.append(ws.cell(num + 1, j).value)
+            arry.sort(reverse=True)
+            print(arry)
+            for n in range(i, i + group):  # 写入新表的相对位置
+                ws2.cell(num + 1, n).value = arry[n - i]
+            for o in range(i, i + group):  # 开始比较
+                d = ws.cell(num + 1, o).value  # 表1中未排序的顺序值
+                for p in range(i, i + group):  # 在表2中循环比较匹配
+                    d2 = ws2.cell(num + 1, p).value
+                    if d2 == d:
+                        for k in range(1, rows + 1):  # 全部行数
+                            ws2.cell(k, p).value = ws.cell(k, o).value
+        group = setcolor(ws2, group, ws2.title)  # 染色结果表格
+    else:
+        return
     wb.save(r'result.xlsx')
 
 
