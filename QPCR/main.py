@@ -10,7 +10,7 @@ from rich import print
 
 def init():
     print('检测更新中...')
-    version = 1.0
+    version = 1.1
     print('此程序版本：' + str(version))
     try:
         urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/QPCR/release.json'
@@ -132,17 +132,28 @@ def dealxlsx(path: str, name: str, canprint: bool):
                 print('转换pmol出错，第' + str(row) + '行数据，名称：' + samplename +
                       '，类型：' + type + '，原因：' + str(e))
         ws.cell(1, 16).value = 'Averange DNA(pmole)'
-        for row in range(23, rows, 3):  # 计算平均mol数
+        ws.cell(1, 17).value = 'Final Averange DNA(pmole)'
+        for row in range(23, rows, 6):  # 计算平均mol数
             try:
                 pmol1 = float(ws.cell(row, 15).value)
                 pmol2 = float(ws.cell(row + 1, 15).value)
                 pmol3 = float(ws.cell(row + 2, 15).value)
+                pmol4 = float(ws.cell(row + 3, 15).value)
+                pmol5 = float(ws.cell(row + 4, 15).value)
+                pmol6 = float(ws.cell(row + 5, 15).value)
                 ws.cell(row + 1, 16).value = (pmol1 + pmol2 + pmol3) / 3
+                ws.cell(row + 4, 16).value = (pmol4 + pmol5 + pmol6) / 3
+                ws.merge_cells(start_row=row + 2,
+                               end_row=row + 3,
+                               start_column=17,
+                               end_column=17)
+                ws.cell(row + 2, 17).value = (ws.cell(row + 1, 16).value +
+                                              ws.cell(row + 4, 16).value) / 2
             except Exception as e:
                 print('计算pmol平均值出错，第' + str(row) + '行数据，原因：' + str(e))
         for row in range(23, rows, 6):  # 着色区分
             columns = ws.max_column + 1
-            color = 'FF6666'
+            color = 'FFB6C1'
             fille = PatternFill('solid', fgColor=color)
             for column in range(1, columns):
                 ws.cell(row, column).fill = fille

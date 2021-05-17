@@ -1,6 +1,6 @@
 {
-    "releases": [
-      { "version": 1.0, "details": "实现Q-PCR数据自动处理" }
-    ]
-  }
-  
+  "releases": [
+    { "version": 1.1, "details": "更改配色，增加数据输出" },
+    { "version": 1.0, "details": "实现Q-PCR数据自动处理" }
+  ]
+}
