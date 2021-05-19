@@ -102,8 +102,8 @@ def dealxlsx(path: str, name: str, canprint: bool):
             except Exception as e:
                 print('计算Copy出错，第' + str(row) + '行数据，名称：' + samplename +
                       '，类型：' + type + '，原因：' + str(e))
-        WashVolumecoefficient = float(input('请输入清洗液的体积：')) / 2
-        ElutionVolumecoefficient = float(input('请输入洗脱液的体积：')) / 2
+        WashVolumecoefficient = float(input('请输入清洗液的体积（单位：μL）：')) / 2
+        ElutionVolumecoefficient = float(input('请输入洗脱液的体积（单位：μL）：')) / 2
         ws.cell(1, 15).value = 'DNA(pmole)'
         for row in range(2, rows):  # 计算mol数
             try:
