@@ -10,7 +10,7 @@ from rich import print
 
 def init():
     print('检测更新中...')
-    version = 1.1
+    version = 1.2
     print('此程序版本：' + str(version))
     try:
         urlgithub = 'https://raw.githubusercontent.com/evilbutcher/Python/master/QPCR/release.json'
@@ -55,9 +55,9 @@ def dealxlsx(path: str, name: str, canprint: bool):
         sheetnames = wb.sheetnames
         ws = wb[sheetnames[0]]
         rows = ws.max_row + 1
-        slope = float(input('请输入Origin拟合方程的斜率'))
+        slope = float(input('请输入Origin拟合方程的斜率：'))
         intercept = float(
-            input('请输入Origin拟合方程的截距'))  # Ct = intercept + slope * x
+            input('请输入Origin拟合方程的截距：'))  # Ct = intercept + slope * x
         ws.cell(1, 13).value = 'Log Copy'
         for row in range(2, rows):  # 计算Log Copy数
             try:
